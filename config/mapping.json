@@ -1,0 +1,21 @@
+{
+  "airtable": {
+    "baseId": "appXXXXXXXXXXXXXX",
+    "table": "Leads",
+    "modifiedField": "Last Modified",
+    "linkField": "supabase_id"
+  },
+  "supabase": {
+    "table": "leads",
+    "linkColumn": "airtable_id",
+    "modifiedColumn": "updated_at"
+  },
+  "fields": [
+    { "airtable": "Name",   "supabase": "name",   "type": "string" },
+    { "airtable": "Email",  "supabase": "email",  "type": "string" },
+    { "airtable": "Status", "supabase": "status", "type": "enum"   },
+    { "airtable": "Amount", "supabase": "amount", "type": "number" }
+  ],
+  "conflictStrategy": "last-write-wins",
+  "direction": "two-way"
+}

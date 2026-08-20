@@ -1,0 +1,26 @@
+{
+  "name": "airtable-supabase-sync",
+  "version": "0.1.0",
+  "description": "Two-way, config-driven sync between an Airtable table and a Supabase (Postgres) table, with last-write-wins conflict resolution and Telegram error alerts.",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "once": "node src/index.js --verbose",
+    "test": "node --test"
+  },
+  "keywords": [
+    "airtable",
+    "supabase",
+    "sync",
+    "integration",
+    "idempotency"
+  ],
+  "author": "Ibragim Salimgariev",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}
