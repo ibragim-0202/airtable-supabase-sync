@@ -5,6 +5,7 @@ import { validateMapping, normalizeAirtable, normalizeSupabase } from './mapping
 import { classify, summarizeDecisions } from './classify.js';
 import { resolveDecisions } from './resolve.js';
 import { applyDecisions } from './apply.js';
+import { detectOrphans } from './orphans.js';
 import { createAirtableClient } from './clients/airtable.js';
 import { createSupabaseClient } from './clients/supabase.js';
 import { formatAlert, sendAlert } from './telegram.js';
@@ -67,6 +68,21 @@ export async function runSync() {
   // Surface conflicts explicitly so overwrites are never silent.
   for (const d of resolved) {
     if (d.tie) logger.warn(`conflict tie -> airtable kept for ${d.winner?.airtableId}`);
+  }
+
+  // Detect records deleted on one side. We never auto-delete the mirror; we
+  // flag it 'orphan' and let the alert surface it for a human decision.
+  const orphans = detectOrphans(syncState, airRecs, supRecs);
+  for (const o of orphans) {
+    logger.warn(`orphan: airtable_id=${o.airtable_id} supabase_id=${o.supabase_id} missing=${o.missing.join(',')}`);
+    errors.push({ type: 'orphan', key: o.airtable_id || o.supabase_id, message: `deleted on ${o.missing.join(',')}` });
+    if (!dryRun) {
+      try {
+        await supabase.upsertSyncState({ airtable_id: o.airtable_id, supabase_id: o.supabase_id, status: 'orphan' });
+      } catch (err) {
+        logger.warn(`failed to flag orphan ${o.airtable_id}: ${err.message}`);
+      }
+    }
   }
 
   if (errors.length > 0) {
