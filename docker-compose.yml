@@ -1,0 +1,12 @@
+services:
+  sync:
+    build: .
+    restart: unless-stopped
+    # TZ drives the cron schedule (see docker/crontab).
+    environment:
+      - TZ=${TZ:-Europe/Istanbul}
+      - RUN_ON_START=${RUN_ON_START:-false}
+    volumes:
+      # Secrets: the app reads /app/.env via its own loader, so cron jobs get
+      # them without cron needing an environment of its own.
+      - ./.env:/app/.env:ro

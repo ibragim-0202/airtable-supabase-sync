@@ -1,0 +1,4 @@
+# Poll-based sync — every 15 minutes, in the container's TZ.
+# Secrets are read by the app from the mounted /app/.env, so cron needs no env.
+# Output goes to PID 1 so `docker logs` shows it.
+*/15 * * * * cd /app && /usr/local/bin/node src/index.js >> /proc/1/fd/1 2>/proc/1/fd/2
